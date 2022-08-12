@@ -70,5 +70,36 @@ namespace DBConnectorandMapulation
             }
         }
 
+
+        public bool Authentication(t_users user)
+        {
+            bool result = false;
+            if (doesUserExist(user) && doesUserPasswordRight(user))
+                result = true;
+            return result;
+        }
+
+        private bool doesUserExist(t_users user)
+        {
+            bool result = false;
+            using (MySqlConnection connection = new MySqlConnection(ConnectionString))
+            {
+                connection.Open();
+                MySqlCommand cmd = new MySqlCommand($"SELECT COUNT(*) FROM t_users WHERE users_username = {user.users_username}", connection);
+                result = (Int32)cmd.ExecuteScalar() >= 1 ? true : false ;
+            }
+            return result;
+        }
+        private bool doesUserPasswordRight(t_users user)
+        {
+            bool result = false;
+            using (MySqlConnection connection = new MySqlConnection(ConnectionString))
+            {
+                connection.Open();
+                MySqlCommand cmd = new MySqlCommand($"SELECT COUNT(*) FROM t_users WHERE users_username = {user.users_username} AND users_password = {user.users_password}", connection);
+                result = (Int32)cmd.ExecuteScalar() == 1 ? true : false;
+            }
+            return result;
+        }
     }
 }
