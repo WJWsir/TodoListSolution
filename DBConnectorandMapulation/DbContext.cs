@@ -85,8 +85,8 @@ namespace DBConnectorandMapulation
             using (MySqlConnection connection = new MySqlConnection(ConnectionString))
             {
                 connection.Open();
-                MySqlCommand cmd = new MySqlCommand($"SELECT COUNT(*) FROM t_users WHERE users_username = {user.users_username}", connection);
-                result = (Int32)cmd.ExecuteScalar() >= 1 ? true : false ;
+                MySqlCommand cmd = new MySqlCommand($"SELECT COUNT(*) FROM t_users WHERE users_username = '{user.users_username}'", connection);
+                result = (Int64)cmd.ExecuteScalar() >= 1 ? true : false ;
             }
             return result;
         }
@@ -96,8 +96,8 @@ namespace DBConnectorandMapulation
             using (MySqlConnection connection = new MySqlConnection(ConnectionString))
             {
                 connection.Open();
-                MySqlCommand cmd = new MySqlCommand($"SELECT COUNT(*) FROM t_users WHERE users_username = {user.users_username} AND users_password = {user.users_password}", connection);
-                result = (Int32)cmd.ExecuteScalar() == 1 ? true : false;
+                MySqlCommand cmd = new MySqlCommand($"SELECT COUNT(*) FROM t_users WHERE users_username = '{user.users_username}' AND users_password = '{user.users_password}'", connection);
+                result = (Int64)cmd.ExecuteScalar() == 1 ? true : false;
             }
             return result;
         }

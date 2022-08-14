@@ -24,6 +24,9 @@ namespace mysqlConnectionDemo
         {
             services.AddControllersWithViews();
             //services.AddRazorPages();
+
+            // Add Session Service. Unable to resolve service for type 'Microsoft.AspNetCore.Session.ISessionStore'.
+            services.AddSession();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,11 +47,14 @@ namespace mysqlConnectionDemo
 
             app.UseAuthorization();
 
+            // enable session
+            app.UseSession();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=index}/{id?}"
+                    pattern: "{controller=Users}/{action=Index}/{id?}"
                     );
                 //endpoints.MapRazorPages();
             });

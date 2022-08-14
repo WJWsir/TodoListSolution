@@ -8,14 +8,18 @@ using DBConnectorandMapulation.Models;
 using Newtonsoft.Json;
 using YouZack.FromJsonBody;
 using DBConnectorandMapulation.Models.Dtos;
+using Microsoft.AspNetCore.Http;
 
-namespace mysqlConnectionDemo.Controllers
+namespace TodosWebApp.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         public IActionResult Index()
         {
-            return View();
+            if (IsLogin)
+                return View();
+            else
+                return Redirect("/Users/Index");//返回登录页面
         }
 
         [HttpGet]
