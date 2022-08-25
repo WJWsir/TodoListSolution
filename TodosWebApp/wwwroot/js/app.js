@@ -1,20 +1,20 @@
 class Todo {
     /** 带有 JSON转换作用 的Todo类
-     * Todo 对象 在 数据库 与 前端 中 属性名与属性数据类型存在差异, 
+     * Todo 对象 在 后端 与 前端 中 属性名与属性数据类型存在差异, 
      * 所以从后台获取额JSON与前台使用的JSON对象属性存在区别,
-     * 在 isCompleted(frontend) 与 todos_isCompleted(backend) JSON属性对比可见差异性
+     * 在 isCompleted(frontend) 与 todo_isCompleted(backend) JSON属性对比可见差异性
      * @param {Array(t_todos)} data
      */
     constructor(data) {
-        this.todos_identity = data.todos_identity;
-        this.todos_textContent = data.todos_textContent;
-        this.todos_isCompleted = data.todos_isCompleted;
+        this.todo_identity = data.todo_identity;
+        this.todo_textContent = data.todo_textContent;
+        this.todo_isCompleted = data.todo_isCompleted;
     }
-    get identity() { return this.todos_identity; }
-    get textContent() { return this.todos_textContent; }
-    set textContent(value) { this.todos_textContent = value; }
-    get isCompleted() { return this.todos_isCompleted ? true : false; }
-    set isCompleted(value) { value == true ? this.todos_isCompleted = 1 : this.todos_isCompleted = 0; }
+    get identity() { return this.todo_identity; }
+    get textContent() { return this.todo_textContent; }
+    set textContent(value) { this.todo_textContent = value; }
+    get isCompleted() { return this.todo_isCompleted ? true : false; }
+    set isCompleted(value) { value == true ? this.todo_isCompleted = 1 : this.todo_isCompleted = 0; }
 }
 
 let filtor = {
@@ -29,24 +29,33 @@ let filtor = {
     }
 }
 
+//convert FormData to Object
+var serializeFormToObject = function (form) {
+    var objForm = {};
+    var formData = new FormData(form);
+    for (var key of formData.keys()) {
+        objForm[key] = formData.get(key);
+    }
+    return objForm;
+};
+
 let backend = (function () {
     let todosRestfulapi = function () {
     }
     todosRestfulapi.prototype.get = function () {
         // GET request for remote todos
-        return axios({
-            method: 'get',
-            url: '/Home/GetAll',
-            responseType: 'json'
+        return fetch('/Home/GetAll', {
+            method: 'GET'
         });
     }
     todosRestfulapi.prototype.save = function (todos) {
         // Post request for remote todos: Update, Insert, Delete
-        return axios({
-            method: 'post',
-            url: '/Home/Save',
-            data: {
-                todos: todos
+        var dataSended = { todos: todos };
+        return fetch('/Home/Save', {
+            method: 'POST',
+            body: JSON.stringify(dataSended),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8'
             }
         });
     }
@@ -60,10 +69,18 @@ let app = new Vue({
     created() {
         backend
             .get()
-            .then(function (response) {
-                app.todos = response.data
-                    .map(todo => new Todo(todo));
-            });
+            .then(response => {
+                if (response.ok)
+                    return response.json();
+                else {
+                    return Promise.reject(new Error("Get User Todo List Failure!!!"));
+                }
+            })
+            .then(result => {
+                app.todos = result
+                    ?.map(todo => new Todo(todo)) // 用来阻止 null引用异常. 若为 NULL 或 undefine则返回undefine, 否则继续后面的.运算操作
+                    ?? [];// ?? 若为 NULL 或 undefine 则默认返回 后面的表达式值
+            }, error => alert(error.message));
     },
     data() {
         return {
@@ -88,9 +105,9 @@ let app = new Vue({
                 return;
             }
             this.todos.push(new Todo({
-                todos_identity: (_.max(this.todos.map(t => t.identity)) || 0) + 1 ,// 取最大identity+1为新的unique identity, 没有todo时为1
-                todos_textContent: value,
-                todos_isCompleted: 0
+                todo_identity: (_.max(this.todos.map(t => t.identity)) || 0) + 1 ,// 取最大identity+1为新的unique identity, 没有todo时为1
+                todo_textContent: value,
+                todo_isCompleted: 0
             }));
             this.newTodo = ''
         },

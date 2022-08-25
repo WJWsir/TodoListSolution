@@ -27,16 +27,17 @@ namespace TodosWebApp.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Login([FromBody] t_users t_users)
+        public IActionResult Login([FromBody] t_user t_users)
         {
             HttpContext.Response.ContentType = "application/json; charset=UTF-8";
-            if (!string.IsNullOrEmpty(t_users.users_username) && !string.IsNullOrEmpty(t_users.users_password))
+            if (!string.IsNullOrEmpty(t_users.user_username) && !string.IsNullOrEmpty(t_users.user_password))
             {
-                byte[] username = System.Text.Encoding.UTF8.GetBytes(t_users.users_username);
+                byte[] username = System.Text.Encoding.UTF8.GetBytes(t_users.user_username);
                 if (new DbContext().Authentication(t_users))
                 {
                     HttpContext.Session.Set("UserName", username);
                     //HttpContext.Session.SetString("UserName", t_users.users_username);
+                    HttpContext.Session.SetInt32("UserIdentity", new DbContext().GetUserId(t_users));
                     return Json(new { err = "0", errMsg = "登录验证成功" });
                 }
                 else

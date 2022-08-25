@@ -25,15 +25,18 @@ namespace TodosWebApp.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            List<t_todos> data = new DbContext().selectAll();
+            IUserTodosOperation operation = new UserTodosOperation();
+            List<t_todo> data = operation.QueryTodos(new t_user { user_identity = Session_UserId });
             return this.Json(data);
         }
 
         [HttpPost]
         public IActionResult Save([FromBody] SaveTodosDtos todos)
         {
-            if (ModelState.IsValid) { 
-                new DbContext().updateAll(todos.todos);
+            if (ModelState.IsValid)
+            {
+                IUserTodosOperation operation = new UserTodosOperation();
+                operation.UpdateTodos(new t_user { user_identity = Session_UserId }, todos.todos);
             }
             else
             {

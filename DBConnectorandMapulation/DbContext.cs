@@ -26,52 +26,12 @@ namespace DBConnectorandMapulation
             return result;
         }
 
-
-        public List<t_todos> selectAll()
-        {
-            var result = new List<t_todos>();
-            using (MySqlConnection connection = new MySqlConnection(ConnectionString))
-            {
-                connection.Open();
-                MySqlCommand cmd = new MySqlCommand("SELECT * FROM t_todos", connection);
-                using (MySqlDataReader reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        result.Add(new t_todos()
-                        {
-                            todos_identity = reader.GetInt32("todos_identity"),
-                            todos_textContent = reader.GetString("todos_textContent"),
-                            todos_isCompleted = reader.GetUInt16("todos_isCompleted"),
-                        });
-                    }
-                }
-            }
-            return result;
-        }
-
-        public void updateAll(List<t_todos> todos)
-        {
-            using (MySqlConnection connection = new MySqlConnection(ConnectionString))
-            {
-                connection.Open();
-                // 删表所有数据
-                MySqlCommand cmd = new MySqlCommand("DELETE FROM t_todos", connection);
-                cmd.ExecuteNonQuery();
-                // 插入
-                foreach(var todo in todos)
-                {
-                   cmd.CommandText = $@"INSERT INTO t_todos
-                                         (todos_identity, todos_textContent, todos_isCompleted)
-                                        VALUES
-                                        ({todo.todos_identity}, '{todo.todos_textContent}', {todo.todos_isCompleted})";
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
-
-
-        public bool Authentication(t_users user)
+        /// <summary>
+        /// 身份认证
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public bool Authentication(t_user user)
         {
             bool result = false;
             if (doesUserExist(user) && doesUserPasswordRight(user))
@@ -79,24 +39,41 @@ namespace DBConnectorandMapulation
             return result;
         }
 
-        private bool doesUserExist(t_users user)
+        /// <summary>
+        /// 获取UserId
+        /// </summary>
+        /// <param name="user">用户名</param>
+        /// <returns>Get users_identity</returns>
+        public int GetUserId(t_user user)
+        {
+            int result;
+            using (MySqlConnection connection = new MySqlConnection(ConnectionString))
+            {
+                connection.Open();
+                MySqlCommand cmd = new MySqlCommand($"SELECT t_users.users_identity FROM t_users WHERE users_username = '{user.user_username}'", connection);
+                result = (Int32)cmd.ExecuteScalar();
+            }
+            return result;
+        }
+
+        private bool doesUserExist(t_user user)
         {
             bool result = false;
             using (MySqlConnection connection = new MySqlConnection(ConnectionString))
             {
                 connection.Open();
-                MySqlCommand cmd = new MySqlCommand($"SELECT COUNT(*) FROM t_users WHERE users_username = '{user.users_username}'", connection);
+                MySqlCommand cmd = new MySqlCommand($"SELECT COUNT(*) FROM t_users WHERE users_username = '{user.user_username}'", connection);
                 result = (Int64)cmd.ExecuteScalar() >= 1 ? true : false ;
             }
             return result;
         }
-        private bool doesUserPasswordRight(t_users user)
+        private bool doesUserPasswordRight(t_user user)
         {
             bool result = false;
             using (MySqlConnection connection = new MySqlConnection(ConnectionString))
             {
                 connection.Open();
-                MySqlCommand cmd = new MySqlCommand($"SELECT COUNT(*) FROM t_users WHERE users_username = '{user.users_username}' AND users_password = '{user.users_password}'", connection);
+                MySqlCommand cmd = new MySqlCommand($"SELECT COUNT(*) FROM t_users WHERE users_username = '{user.user_username}' AND users_password = '{user.user_password}'", connection);
                 result = (Int64)cmd.ExecuteScalar() == 1 ? true : false;
             }
             return result;

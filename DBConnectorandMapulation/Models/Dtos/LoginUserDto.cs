@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DBConnectorandMapulation.Models.Dtos
 {
-    public class LoginUserDto : t_users
+    public class LoginUserDto : t_user
     {
 
     }

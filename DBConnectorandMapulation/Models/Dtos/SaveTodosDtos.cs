@@ -6,6 +6,6 @@ namespace DBConnectorandMapulation.Models.Dtos
 {
     public class SaveTodosDtos
     {
-        public List<t_todos> todos { set; get; }
+        public List<t_todo> todos { set; get; }
     }
 }
