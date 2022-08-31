@@ -93,7 +93,9 @@ let app = new Vue({
     watch: {
         todos: {
             handler: function (todos) {
-                backend.save(todos);
+                backend.save(todos)
+                    .then((response) => response.text())
+                    .then((result) => console.log(result));
             },
             deep: true
         }

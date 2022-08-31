@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 using YouZack.FromJsonBody;
 using DBConnectorandMapulation.Models.Dtos;
 using Microsoft.AspNetCore.Http;
+using TodosWebApp.Utilities;
+using Serilog;
 
 namespace TodosWebApp.Controllers
 {
@@ -35,7 +37,10 @@ namespace TodosWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (!IsLogin)// Session is expired
+                    return Content("请重新登录!!!");
                 IUserTodosOperation operation = new UserTodosOperation();
+                Log.Logger.Information($"用户操作: 用户 {Session_UserName} 使用IP {HttpContext.Connection.RemoteIpAddress} 于日期时间 {DateTime.Now} 变更代办事项");
                 operation.UpdateTodos(new t_user { user_identity = Session_UserId }, todos.todos);
             }
             else
